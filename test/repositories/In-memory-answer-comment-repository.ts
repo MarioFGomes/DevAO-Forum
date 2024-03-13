@@ -1,3 +1,4 @@
+import { PaginationParams } from "@/core/share/repositories/pagination-params";
 import { AnswerCommentRepository } from "@/domain/forum/application/repositories/answer-comment-repository";
 import { AnswerComment } from "@/domain/forum/enterprise/entities/answer-comment";
 
@@ -11,6 +12,13 @@ export class InMemoryCommentOnAnswerRepository implements AnswerCommentRepositor
         if(!answerComment) return null;
 
         return answerComment;
+    }
+
+    async findManyAnswerComment(answerId: string, {page}: PaginationParams) {
+        const answerComments=this.item.filter(e=>e.answerId.toString()===answerId)
+        .sort((a,b) => b.createdAt.getTime() - a.createdAt.getTime())
+        .slice((page-1)*20,page*20);
+        return answerComments
     }
 
     
