@@ -4,7 +4,7 @@ import { makeQuestion } from 'test/factories/make-question';
 import { ChooseBestAnswerQuestionUseCase } from './choose-question-best-answer';
 import { InMemoryAnswerRepository } from 'test/repositories/In-memory-answer-question-repository';
 import { makeAnswer } from 'test/factories/make-answer';
-import { a } from 'vitest/dist/suite-UrZdHRff';
+import { NotAllowedError } from './errors/not-allowed-error';
 
 let inMemoryQuestionRepository:InMemoryQuestionRepository;
 let inMemoryAnswerRepository:InMemoryAnswerRepository;
@@ -45,14 +45,12 @@ test('should not be able to choose another user  question best answer',async ()=
         answerId:answer.id.toString(),
         authorId:question.authorId.toString(),
     });
-
-    expect(()=>{
-    return sut.execute({
+    const result= await sut.execute({
         answerId:answer.id.toString(),
         authorId:'author-2',
     });
-    }).rejects.toBeInstanceOf(Error);
 
-
+   expect(result.isLeft()).toBe(true);
+   expect(result.value).toBeInstanceOf(NotAllowedError)
 });
 })

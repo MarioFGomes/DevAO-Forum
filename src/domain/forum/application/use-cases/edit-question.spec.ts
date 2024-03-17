@@ -2,6 +2,7 @@ import { InMemoryQuestionRepository } from 'test/repositories/In-memory-question
 import { UniqueEntityID } from '@/core/entities/unique-entity-id';
 import { makeQuestion } from 'test/factories/make-question';
 import { EditQuestionUseCase } from './edit-question';
+import { NotAllowedError } from './errors/not-allowed-error';
 
 let inMemoryQuestionRepository:InMemoryQuestionRepository;
 let sut:EditQuestionUseCase;
@@ -42,15 +43,15 @@ test('should not be able to edit a question from another user',async ()=>{
 
 	await inMemoryQuestionRepository.create(newQuestion);
 
-    expect(()=>{
-    return sut.execute({
+    const result=await sut.execute({
         questionId:newQuestion.id.toValue(),
         authorId:'author-2',
         title:'title of question',
         content: 'content of question'
-        });
-    }).rejects.toBeInstanceOf(Error);
+    });
 
+    expect(result.isLeft()).toBe(true);
+    expect(result.value).toBeInstanceOf(NotAllowedError)
 
 });
 })

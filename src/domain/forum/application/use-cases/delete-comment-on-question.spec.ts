@@ -2,6 +2,7 @@ import { InMemoryCommentOnQuestionRepository } from 'test/repositories/In-memory
 import { makeQuestionComment } from 'test/factories/make-question-comment';
 import { UniqueEntityID } from '@/core/entities/unique-entity-id';
 import { DeleteCommentOnQuestionUseCase } from './delete-comment-on-question';
+import { NotAllowedError } from './errors/not-allowed-error';
 
 let inMemoryCommentOnQuestionRepository:InMemoryCommentOnQuestionRepository;
 let sut:DeleteCommentOnQuestionUseCase;
@@ -33,11 +34,12 @@ test('should not be able to delete a comment on question from another user',asyn
 
 	await inMemoryCommentOnQuestionRepository.create(questionComment);
 
-    expect(()=>{
-    return sut.execute({
+    const result=await sut.execute({
         authorId:'1',
         questionCommentId:'question-1',
         });
-    }).rejects.toBeInstanceOf(Error);
+
+    expect(result.isLeft()).toBe(true);
+    expect(result.value).toBeInstanceOf(NotAllowedError)
 });
 })

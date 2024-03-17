@@ -1,4 +1,8 @@
+import { Either, left, right } from '@/core/either';
 import { QuestionCommentRepository } from '../repositories/question-comment-repository';
+import { UseCaseErrors } from '@/core/errors/use-case-error';
+import { ResourceNotFound } from './errors/resource-not-found-error';
+import { NotAllowedError } from './errors/not-allowed-error';
 
 
 interface DeleteCommentOnQuestionRequest{
@@ -6,7 +10,7 @@ interface DeleteCommentOnQuestionRequest{
     questionCommentId: string, 
 }
 
-interface DeleteCommentOnQuestionResponse{}
+type DeleteCommentOnQuestionResponse=Either<UseCaseErrors,{}>
 
 export class DeleteCommentOnQuestionUseCase{
 
@@ -16,12 +20,12 @@ export class DeleteCommentOnQuestionUseCase{
     {
         const questionComment= await this.questionCommentRepository.findById(questionCommentId);
 
-        if(!questionComment) throw new Error('comment not found');
+        if(!questionComment) return left(new ResourceNotFound());
 
-        if(authorId!==questionComment.authorId.toString()) throw new Error('Not authorized')
+        if(authorId!==questionComment.authorId.toString()) return left(new NotAllowedError());
 
         await this.questionCommentRepository.delete(questionComment);
 
-        return {};
+        return right({});
 	}
 }

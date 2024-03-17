@@ -2,6 +2,7 @@ import { UniqueEntityID } from '@/core/entities/unique-entity-id';
 import { makeAnswer } from 'test/factories/make-answer';
 import { DeleteAnswerUseCase } from './delete-answer';
 import { InMemoryAnswerRepository } from 'test/repositories/In-memory-answer-question-repository';
+import { NotAllowedError } from './errors/not-allowed-error';
 
 let inMemoryAnswerRepository:InMemoryAnswerRepository;
 let sut:DeleteAnswerUseCase;
@@ -37,13 +38,13 @@ test('should not be able to delete a answer from another user',async ()=>{
 
 	await inMemoryAnswerRepository.create(newAnswer);
 
-    expect(()=>{
-    return sut.execute({
-            answerId:'answer-1',
-            authorId:'author-2'
-        });
-    }).rejects.toBeInstanceOf(Error);
+    const result= await sut.execute({
+        answerId:'answer-1',
+        authorId:'author-2'
+    });
 
+    expect(result.isLeft()).toBe(true);
+    expect(result.value).toBeInstanceOf(NotAllowedError)
 
 });
 })

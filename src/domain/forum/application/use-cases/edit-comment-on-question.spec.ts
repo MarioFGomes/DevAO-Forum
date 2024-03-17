@@ -2,6 +2,7 @@ import { InMemoryCommentOnQuestionRepository } from 'test/repositories/In-memory
 import { EditCommentOnQuestionUseCase } from './edit-comment-on-question';
 import { makeQuestionComment } from 'test/factories/make-question-comment';
 import { UniqueEntityID } from '@/core/entities/unique-entity-id';
+import { NotAllowedError } from './errors/not-allowed-error';
 
 let inMemoryCommentOnQuestionRepository:InMemoryCommentOnQuestionRepository;
 let sut:EditCommentOnQuestionUseCase;
@@ -14,14 +15,14 @@ describe('Edit Comment on Question', () => {
 test('should be able to edit a comment on question',async ()=>{
 
     await inMemoryCommentOnQuestionRepository.create(makeQuestionComment({authorId:new UniqueEntityID('author-1')},new UniqueEntityID('questionComment-1')))
-	const {questionComment}=await sut.execute({
+	const result=await sut.execute({
 		authorId:'author-1',
         questionCommentId:'questionComment-1',
 		content:'Edit Content of Question comment'
 	});
 
 
-	expect(questionComment.id).toBeTruthy();
+	expect(result.isRight()).toBe(true);
 	expect(inMemoryCommentOnQuestionRepository.item[0].content).toEqual('Edit Content of Question comment')
 
 });
@@ -34,13 +35,14 @@ test('should not be able to edit a comment on question from another user',async 
 
 	await inMemoryCommentOnQuestionRepository.create(questionComment);
 
-    expect(()=>{
-    return sut.execute({
-        authorId:'1',
-        questionCommentId:'question-1',
+    const result=await sut.execute({
+		authorId:'1',
+		questionCommentId:'question-1',
 		content:'Edit Content of Question comment'
-        });
-    }).rejects.toBeInstanceOf(Error);
+	});
+
+	expect(result.isLeft()).toBe(true);
+    expect(result.value).toBeInstanceOf(NotAllowedError)
 
 
 });

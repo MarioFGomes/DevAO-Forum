@@ -1,4 +1,8 @@
+import { Either, left, right } from '@/core/either';
 import { QuestionRepository } from '../repositories/question-repository';
+import { UseCaseErrors } from '@/core/errors/use-case-error';
+import { ResourceNotFound } from './errors/resource-not-found-error';
+import { NotAllowedError } from './errors/not-allowed-error';
 
 
 interface DeleteQuestionRequest{
@@ -6,7 +10,7 @@ interface DeleteQuestionRequest{
     authorId:string
 }
 
-interface DeleteQuestionResponse{}
+type DeleteQuestionResponse=Either<UseCaseErrors,{}>
 
 export class DeleteQuestionUseCase{
 	constructor(private questionRepository:QuestionRepository){}
@@ -15,12 +19,12 @@ export class DeleteQuestionUseCase{
     {
     const question=await this.questionRepository.findById(questionId);
 
-    if(!question) throw new Error('Question not exist');
+    if(!question) return left(new ResourceNotFound());
     
-    if(authorId!== question.authorId.toString()) throw new Error('Not authorized');
+    if(authorId!== question.authorId.toString()) return left(new NotAllowedError());
 
     await this.questionRepository.delete(question);
 
-        return {};
+        return right({});
 	}
 }

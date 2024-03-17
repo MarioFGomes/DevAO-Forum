@@ -11,15 +11,15 @@ let sut:AnswerQuestionUseCase;
 
 test('should be able to create a new  answer',async ()=>{
 
-	const {answer}=await sut.execute({
+	const result=await sut.execute({
 		instructorId: '1',
 		questionId: '1',
 		content:'Content of answer'
 	});
 
 
-	expect(answer.id).toBeTruthy();
-	expect(inMemoryAnswerRepository.item[0].id).toEqual(answer.id)
+	expect(result.isRight()).toBe(true);
+	expect(inMemoryAnswerRepository.item[0]).toEqual(result.value?.answer)
 
 });
 })

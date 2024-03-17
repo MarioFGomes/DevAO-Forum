@@ -2,6 +2,7 @@ import { UniqueEntityID } from '@/core/entities/unique-entity-id';
 import { makeAnswer } from 'test/factories/make-answer';
 import { EditAnswerUseCase } from './edit-answer';
 import { InMemoryAnswerRepository } from 'test/repositories/In-memory-answer-question-repository';
+import { NotAllowedError } from './errors/not-allowed-error';
 
 let inMemoryAnswerRepository:InMemoryAnswerRepository;
 let sut:EditAnswerUseCase;
@@ -40,13 +41,14 @@ test('should not be able to edit a answer from another user',async ()=>{
 
 	await inMemoryAnswerRepository.create(newAnswer);
 
-    expect(()=>{
-    return sut.execute({
+    const result=await sut.execute({
         answerId:newAnswer.id.toValue(),
         authorId:'author-2',
         content: 'content of answer'
         });
-    }).rejects.toBeInstanceOf(Error);
+
+    expect(result.isLeft()).toBe(true);
+    expect(result.value).toBeInstanceOf(NotAllowedError)
 
 
 });

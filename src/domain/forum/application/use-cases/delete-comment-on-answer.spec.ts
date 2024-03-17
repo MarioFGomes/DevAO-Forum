@@ -37,7 +37,7 @@ test('should not be able to delete a comment on answer from another user',async 
     const result= await sut.execute({
         authorId:'1',
         answerCommentId:'answer-1',
-        });
+        }); 
         expect(result.isLeft()).toBe(true);
         expect(result.value).instanceOf(NotAllowedError)
 });

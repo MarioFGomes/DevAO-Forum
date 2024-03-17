@@ -18,14 +18,14 @@ test('should be able to create a new comment on question',async ()=>{
 
     await inMemoryQuestionRepository.create(makeQuestion({},new UniqueEntityID('question-1')));
 
-	const {comment}=await sut.execute({
+	const result=await sut.execute({
 		authorId:'1',
         questionId:'question-1',
 		content:'Content of Question comment'
 	});
 
 
-	expect(comment.id).toBeTruthy();
+	expect(result.isRight()).toBe(true);
 	expect(inMemoryCommentOnQuestionRepository.item[0].content).toEqual('Content of Question comment')
 
 });

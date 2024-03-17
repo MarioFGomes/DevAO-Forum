@@ -1,5 +1,9 @@
+import { Either, left, right } from '@/core/either';
 import { Answer } from '../../enterprise/entities/answer';
 import { AnswerRepository } from '../repositories/answers-repository';
+import { UseCaseErrors } from '@/core/errors/use-case-error';
+import { ResourceNotFound } from './errors/resource-not-found-error';
+import { NotAllowedError } from './errors/not-allowed-error';
 
 interface EditAnswerRequest{
     answerId:string,
@@ -7,9 +11,9 @@ interface EditAnswerRequest{
     content:string
 }
 
-interface EditAnswerResponse{
+type EditAnswerResponse=Either<UseCaseErrors,{
     answer:Answer
-}
+}>
 
 export class EditAnswerUseCase{
 	constructor(private answerRepository:AnswerRepository){}
@@ -18,14 +22,14 @@ export class EditAnswerUseCase{
     {
     const answer=await this.answerRepository.findById(answerId);
 
-    if(!answer) throw new Error('Answer not exist');
+    if(!answer) return left(new ResourceNotFound());
     
-    if(authorId!== answer.authorId.toString()) throw new Error('Not authorized');
+    if(authorId!== answer.authorId.toString()) return left(new NotAllowedError());
 
     answer.content =content;
 
     await this.answerRepository.save(answer);
 
-        return {answer};
+        return right({answer});
 	}
 }

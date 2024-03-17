@@ -1,5 +1,9 @@
+import { Either, left, right } from '@/core/either';
 import { AnswerComment } from '../../enterprise/entities/answer-comment';
 import { AnswerCommentRepository } from '../repositories/answer-comment-repository';
+import { UseCaseErrors } from '@/core/errors/use-case-error';
+import { ResourceNotFound } from './errors/resource-not-found-error';
+import { NotAllowedError } from './errors/not-allowed-error';
 
 
 interface EditCommentOnAnswerRequest{
@@ -8,9 +12,9 @@ interface EditCommentOnAnswerRequest{
     content: string,
 }
 
-interface EditCommentOnAnswerResponse{
+type EditCommentOnAnswerResponse=Either<UseCaseErrors,{
     answerComment:AnswerComment;
-}
+}>
 
 export class EditCommentOnAnswerUseCase{
 
@@ -20,16 +24,16 @@ export class EditCommentOnAnswerUseCase{
     {
         const answerComment= await this.answerCommentRepository.findById(answerCommentId);
 
-        if(!answerComment) throw new Error('comment not found');
+        if(!answerComment) return left(new ResourceNotFound());
 
-        if(authorId!==answerComment.authorId.toString()) throw new Error('Not authorized')
+        if(authorId!==answerComment.authorId.toString()) return left(new NotAllowedError());
 
         answerComment.content = content;
 
         await this.answerCommentRepository.save(answerComment);
 
-        return {
+        return right({
             answerComment
-        };
+        });
 	}
 }
