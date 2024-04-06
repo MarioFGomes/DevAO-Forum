@@ -3,14 +3,17 @@ import { InMemoryQuestionRepository } from 'test/repositories/In-memory-question
 import { CommentOnQuestionUseCase } from './comment-on-question';
 import { makeQuestion } from 'test/factories/make-question';
 import { UniqueEntityID } from '@/core/entities/unique-entity-id';
+import { InMemoryQuestionAttachmentRepository } from 'test/repositories/In-memory-question-attachment-repository';
 
 let inMemoryCommentOnQuestionRepository:InMemoryCommentOnQuestionRepository;
 let inMemoryQuestionRepository:InMemoryQuestionRepository;
+let inMemoryQuestionAttachment:InMemoryQuestionAttachmentRepository;
 let sut:CommentOnQuestionUseCase;
  describe('Create Comment on Question', () => {
 	beforeEach(() => {
+		inMemoryQuestionAttachment=new InMemoryQuestionAttachmentRepository();
 		inMemoryCommentOnQuestionRepository=new InMemoryCommentOnQuestionRepository();
-        inMemoryQuestionRepository=new InMemoryQuestionRepository();
+        inMemoryQuestionRepository=new InMemoryQuestionRepository(inMemoryQuestionAttachment);
 		sut=new CommentOnQuestionUseCase(inMemoryCommentOnQuestionRepository,inMemoryQuestionRepository);
 	})
 

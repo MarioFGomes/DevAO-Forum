@@ -3,14 +3,17 @@ import { CommentOnAnswerUseCase } from './comment-on-answer';
 import { makeAnswer } from 'test/factories/make-answer';
 import { UniqueEntityID } from '@/core/entities/unique-entity-id';
 import { InMemoryAnswerRepository } from 'test/repositories/In-memory-answer-question-repository';
+import { InMemoryAnswerAttachmentRepository } from 'test/repositories/In-memory-answer-attachment-repository';
 
 let inMemoryCommentOnAnswerRepository:InMemoryCommentOnAnswerRepository;
 let inMemoryAnswerRepository:InMemoryAnswerRepository;
+let inMemoryAnswerAttachmentRepository:InMemoryAnswerAttachmentRepository
 let sut:CommentOnAnswerUseCase;
  describe('Create Comment on Answer', () => {
 	beforeEach(() => {
+		inMemoryAnswerAttachmentRepository= new InMemoryAnswerAttachmentRepository()
 		inMemoryCommentOnAnswerRepository=new InMemoryCommentOnAnswerRepository();
-        inMemoryAnswerRepository=new InMemoryAnswerRepository();
+        inMemoryAnswerRepository=new InMemoryAnswerRepository(inMemoryAnswerAttachmentRepository);
 		sut=new CommentOnAnswerUseCase(inMemoryCommentOnAnswerRepository,inMemoryAnswerRepository);
 	})
 

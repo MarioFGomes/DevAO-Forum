@@ -5,7 +5,7 @@ import { Either, left, right } from '@/core/either';
 import { ResourceNotFound } from './errors/resource-not-found-error';
 import { NotAllowedError } from './errors/not-allowed-error';
 import { QuestionAttachmentRepository } from '../repositories/question-attachment-repository';
-import { QuestionAttachmentList } from '../../enterprise/question-attachment-list';
+import { QuestionAttachmentList } from '../../enterprise/entities/question-attachment-list';
 import { QuestionAttachment } from '../../enterprise/entities/question-attachment';
 import { UniqueEntityID } from '@/core/entities/unique-entity-id';
 

@@ -3,12 +3,15 @@ import { makeAnswer } from 'test/factories/make-answer';
 import { DeleteAnswerUseCase } from './delete-answer';
 import { InMemoryAnswerRepository } from 'test/repositories/In-memory-answer-question-repository';
 import { NotAllowedError } from './errors/not-allowed-error';
+import { InMemoryAnswerAttachmentRepository } from 'test/repositories/In-memory-answer-attachment-repository';
 
 let inMemoryAnswerRepository:InMemoryAnswerRepository;
+let inMemoryAnswerAttachmentRepository:InMemoryAnswerAttachmentRepository
 let sut:DeleteAnswerUseCase;
 describe('Delete Answer', () => {
 	beforeEach(() => {
-		inMemoryAnswerRepository=new InMemoryAnswerRepository();
+        inMemoryAnswerAttachmentRepository=new InMemoryAnswerAttachmentRepository()
+		inMemoryAnswerRepository=new InMemoryAnswerRepository(inMemoryAnswerAttachmentRepository);
 		sut=new DeleteAnswerUseCase(inMemoryAnswerRepository);
 	})
 
