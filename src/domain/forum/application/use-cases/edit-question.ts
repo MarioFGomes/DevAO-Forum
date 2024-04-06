@@ -4,12 +4,17 @@ import { QuestionRepository } from '../repositories/question-repository';
 import { Either, left, right } from '@/core/either';
 import { ResourceNotFound } from './errors/resource-not-found-error';
 import { NotAllowedError } from './errors/not-allowed-error';
+import { QuestionAttachmentRepository } from '../repositories/question-attachment-repository';
+import { QuestionAttachmentList } from '../../enterprise/question-attachment-list';
+import { QuestionAttachment } from '../../enterprise/entities/question-attachment';
+import { UniqueEntityID } from '@/core/entities/unique-entity-id';
 
 
 interface EditQuestionRequest{
     questionId:string,
     authorId:string,
     title:string,
+    attachmentIds: string[],
     content:string
 }
 
@@ -18,9 +23,10 @@ type EditQuestionResponse=Either<UseCaseErrors,{
 }>
 
 export class EditQuestionUseCase{
-	constructor(private questionRepository:QuestionRepository){}
+	constructor(private questionRepository:QuestionRepository,
+    private questionAttachmentRepository:QuestionAttachmentRepository){}
 
-	async execute({questionId,authorId,title,content}:EditQuestionRequest):Promise<EditQuestionResponse>
+	async execute({questionId,authorId,title,content,attachmentIds}:EditQuestionRequest):Promise<EditQuestionResponse>
     {
     const question=await this.questionRepository.findById(questionId);
 
@@ -28,8 +34,23 @@ export class EditQuestionUseCase{
     
     if(authorId!== question.authorId.toString()) return left(new NotAllowedError());
 
-    question.title =title;
-    question.content =content;
+    const currentQuestionAttachment=await this.questionAttachmentRepository.fetchManyByQuestionId(questionId);
+
+    const questionAttachmentList=new QuestionAttachmentList(currentQuestionAttachment);
+
+    const questionAttachment=attachmentIds.map((attachmentId) =>{
+        return QuestionAttachment.create({
+            attachmentId: new UniqueEntityID(attachmentId),
+            questionId: question.id,
+        })
+    });
+
+    questionAttachmentList.update(questionAttachment);
+
+
+    question.title=title;
+    question.content=content;
+    question.attachments=questionAttachmentList;
 
     await this.questionRepository.save(question);
 
