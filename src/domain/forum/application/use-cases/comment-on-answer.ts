@@ -4,7 +4,7 @@ import { AnswerRepository } from '../repositories/answers-repository';
 import { AnswerCommentRepository } from '../repositories/answer-comment-repository';
 import { Either, left, right } from '@/core/either';
 import { UseCaseErrors } from '@/core/errors/use-case-error';
-import { ResourceNotFound } from './errors/resource-not-found-error';
+import { ResourceNotFound } from '@/core/errors/errors/resource-not-found-error';
 
 
 interface CommentOnAnswerRequest{

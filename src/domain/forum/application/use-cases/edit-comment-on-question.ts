@@ -2,8 +2,8 @@ import { Either, left, right } from '@/core/either';
 import { QuestionComment } from '../../enterprise/entities/question-comment';
 import { QuestionCommentRepository } from '../repositories/question-comment-repository';
 import { UseCaseErrors } from '@/core/errors/use-case-error';
-import { ResourceNotFound } from './errors/resource-not-found-error';
-import { NotAllowedError } from './errors/not-allowed-error';
+import { ResourceNotFound } from '@/core/errors/errors/resource-not-found-error';
+import { NotAllowedError } from '@/core/errors/errors/not-allowed-error';
 
 
 interface EditCommentOnQuestionRequest{

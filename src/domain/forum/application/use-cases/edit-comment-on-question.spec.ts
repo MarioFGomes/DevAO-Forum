@@ -2,7 +2,7 @@ import { InMemoryCommentOnQuestionRepository } from 'test/repositories/In-memory
 import { EditCommentOnQuestionUseCase } from './edit-comment-on-question';
 import { makeQuestionComment } from 'test/factories/make-question-comment';
 import { UniqueEntityID } from '@/core/entities/unique-entity-id';
-import { NotAllowedError } from './errors/not-allowed-error';
+import { NotAllowedError } from '@/core/errors/errors/not-allowed-error';
 
 let inMemoryCommentOnQuestionRepository:InMemoryCommentOnQuestionRepository;
 let sut:EditCommentOnQuestionUseCase;

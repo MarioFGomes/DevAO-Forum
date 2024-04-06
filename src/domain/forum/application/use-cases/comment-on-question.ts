@@ -3,7 +3,7 @@ import { QuestionRepository } from '../repositories/question-repository';
 import { QuestionComment } from '../../enterprise/entities/question-comment';
 import { QuestionCommentRepository } from '../repositories/question-comment-repository';
 import { Either, left, right } from '@/core/either';
-import { ResourceNotFound } from './errors/resource-not-found-error';
+import { ResourceNotFound } from '@/core/errors/errors/resource-not-found-error';
 import { UseCaseErrors } from '@/core/errors/use-case-error';
 
 
