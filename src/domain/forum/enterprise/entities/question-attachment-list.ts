@@ -5,7 +5,7 @@ export class QuestionAttachmentList extends WatchedList<QuestionAttachment>
 {
     
     compareItems(a: QuestionAttachment, b: QuestionAttachment): boolean {
-        return a.attachmentId === b.attachmentId;
+        return a.attachmentId.equals(b.attachmentId);
     }
 
 }
