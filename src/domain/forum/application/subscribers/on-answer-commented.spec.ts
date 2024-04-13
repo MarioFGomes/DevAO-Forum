@@ -1,5 +1,4 @@
 import { makeAnswer } from "test/factories/make-answer"
-import { OnAnswerCreated } from "./on-answer-created"
 import { InMemoryAnswerRepository } from "test/repositories/In-memory-answer-question-repository"
 import { InMemoryAnswerAttachmentRepository } from "test/repositories/In-memory-answer-attachment-repository";
 import { SendNotificationRequest, SendNotificationResponse, SendNotificationUseCase } from "@/domain/notification/application/use-cases/send-notification";
@@ -9,38 +8,42 @@ import { InMemoryNotificationRepository } from "test/repositories/In-memory-noti
 import { makeQuestion } from "test/factories/make-question";
 import { MockInstance } from "vitest";
 import { waitFor } from "test/utils/wait-for";
+import { InMemoryCommentOnAnswerRepository } from "test/repositories/In-memory-answer-comment-repository";
+import { makeAnswerComment } from "test/factories/make-answer-comment";
+import { OnAnswerCommented } from "./on-answer-commented";
 
 
 
 let sendNotificationExecuteSpy:MockInstance<[SendNotificationRequest],Promise<SendNotificationResponse>>
-let inMemoryQuestionRepository:InMemoryQuestionRepository;
-let inMemoryQuestionAttachmentRepository:InMemoryQuestionAttachmentRepository
 let sendNotification:SendNotificationUseCase;
 let inMemoryNotificationRepository:InMemoryNotificationRepository
 let inMemoryAnswerRepository:InMemoryAnswerRepository;
 let inMemoryAnswerAttachmentRepository:InMemoryAnswerAttachmentRepository
-describe('On Answer created',() => {
+let inMemoryCommentOnAnswerRepository:InMemoryCommentOnAnswerRepository;
+describe('On Answer commented',() => {
     beforeAll(() => {
-        inMemoryQuestionAttachmentRepository=new InMemoryQuestionAttachmentRepository();
-        inMemoryQuestionRepository=new InMemoryQuestionRepository(inMemoryQuestionAttachmentRepository);
         inMemoryAnswerAttachmentRepository=new InMemoryAnswerAttachmentRepository();
         inMemoryNotificationRepository=new InMemoryNotificationRepository();
+        inMemoryCommentOnAnswerRepository=new InMemoryCommentOnAnswerRepository()
         sendNotification=new SendNotificationUseCase(inMemoryNotificationRepository);
         inMemoryAnswerRepository=new InMemoryAnswerRepository(inMemoryAnswerAttachmentRepository);
 
-    sendNotificationExecuteSpy=vi.spyOn(sendNotification,'execute');
+        sendNotificationExecuteSpy=vi.spyOn(sendNotification,'execute');
 
-    new OnAnswerCreated(inMemoryQuestionRepository,sendNotification);
+        new OnAnswerCommented(inMemoryAnswerRepository,sendNotification);
     })
     
 
-    it('should be able send notification when an answer is created',async () => {
+    it('should be able send notification when an answer is commented',async () => {
         
         const question=makeQuestion()
         const answer=makeAnswer({questionId:question.id});
+        const answerCommented=makeAnswerComment({
+            answerId:answer.id,
+        });
 
-        inMemoryQuestionRepository.create(question)
-        inMemoryAnswerRepository.create(answer);
+        await inMemoryAnswerRepository.create(answer)
+        await inMemoryCommentOnAnswerRepository.create(answerCommented);
 
         await waitFor(() =>{
             expect(sendNotificationExecuteSpy).toBeCalled();

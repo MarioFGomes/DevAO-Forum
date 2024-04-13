@@ -1,3 +1,4 @@
+import { DomainEvents } from "@/core/events/domain-events";
 import { PaginationParams } from "@/core/share/repositories/pagination-params";
 import { AnswerCommentRepository } from "@/domain/forum/application/repositories/answer-comment-repository";
 import { AnswerComment } from "@/domain/forum/enterprise/entities/answer-comment";
@@ -25,11 +26,13 @@ export class InMemoryCommentOnAnswerRepository implements AnswerCommentRepositor
     async create(data: AnswerComment) 
     {
         this.item.push(data);
+        DomainEvents.dispatchEventsForAggregate(data.id)
     }
 
     async save(answerComment: AnswerComment) {
         const IndexId=this.item.findIndex((item) => item.id===answerComment.id);
         this.item[IndexId] = answerComment;
+        DomainEvents.dispatchEventsForAggregate(answerComment.id)
     }
 
     async delete(answerComment: AnswerComment){
